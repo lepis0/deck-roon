@@ -13,7 +13,7 @@
   <Category>MediaServer:Music</Category>
   <WebUI>http://[IP]:8795/</WebUI>
   <TemplateURL>https://raw.githubusercontent.com/lepis0/deck-roon/main/unraid/deck-roon.xml</TemplateURL>
-  <Icon>https://raw.githubusercontent.com/lepis0/deck-roon/main/deck/static/icon.svg</Icon>
+  <Icon>https://raw.githubusercontent.com/lepis0/deck-roon/main/unraid/icon.png</Icon>
   <ExtraParams/>
   <PostArgs/>
   <CPUset/>

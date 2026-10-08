@@ -1,8 +1,35 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="96" fill="#1e1c19"/>
-  <circle cx="256" cy="256" r="176" fill="#141311" stroke="#2f2c27" stroke-width="8"/>
-  <circle cx="256" cy="256" r="136" fill="none" stroke="#2f2c27" stroke-width="4"/>
-  <circle cx="256" cy="256" r="100" fill="none" stroke="#2f2c27" stroke-width="4"/>
-  <circle cx="256" cy="256" r="60" fill="#e0814f"/>
-  <circle cx="256" cy="256" r="10" fill="#141311"/>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a2622"/>
+      <stop offset="1" stop-color="#171513"/>
+    </linearGradient>
+    <radialGradient id="label" cx="0.4" cy="0.35" r="0.75">
+      <stop offset="0" stop-color="#f09a62"/>
+      <stop offset="1" stop-color="#c9602f"/>
+    </radialGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.10"/>
+      <stop offset="0.55" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="104" fill="url(#bg)"/>
+  <!-- the record -->
+  <circle cx="256" cy="256" r="196" fill="#0e0d0c"/>
+  <g fill="none" stroke="#24211e" stroke-width="3">
+    <circle cx="256" cy="256" r="180"/>
+    <circle cx="256" cy="256" r="164"/>
+    <circle cx="256" cy="256" r="148"/>
+    <circle cx="256" cy="256" r="132"/>
+    <circle cx="256" cy="256" r="116"/>
+    <circle cx="256" cy="256" r="100"/>
+  </g>
+  <circle cx="256" cy="256" r="196" fill="url(#sheen)"/>
+  <!-- the label -->
+  <circle cx="256" cy="256" r="72" fill="url(#label)"/>
+  <circle cx="256" cy="256" r="72" fill="none" stroke="#0e0d0c" stroke-opacity="0.25" stroke-width="4"/>
+  <circle cx="256" cy="256" r="11" fill="#0e0d0c"/>
+  <!-- a star for this week's picks -->
+  <path d="M398 74l11 27 29 2-22 19 7 28-25-15-25 15 7-28-22-19 29-2z" fill="#f09a62"/>
 </svg>
