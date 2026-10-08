@@ -6,8 +6,13 @@ LABEL org.opencontainers.image.source="https://github.com/lepis0/deck-roon" \
 
 WORKDIR /app
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt \
+ && printf '#!/bin/sh\nexec python -m deck "$@"\n' > /usr/local/bin/deck \
+ && chmod +x /usr/local/bin/deck
 COPY deck ./deck
+# The weekly run's host script and prompt: the host reads them with `docker exec`.
+COPY bin/deck-curate ./bin/
+COPY curate ./curate
 
 ENV DECK_DATA=/data DECK_PORT=8795 PYTHONUNBUFFERED=1
 VOLUME /data

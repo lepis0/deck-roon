@@ -1,9 +1,10 @@
 #!/bin/bash
 # The weekly run: Claude Code reads the taste profile and writes this week's list
 # with curate/prompt.md. Run on the Unraid host, e.g. from User Scripts every Monday.
+# The image carries this script, so the host needs no clone of the repo:
+#   bash -c "$(docker exec deck cat /app/bin/deck-curate)"
 set -uo pipefail
 
-HERE=$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)
 export DECK_CONTAINER=${DECK_CONTAINER:-deck}
 CONTAINER=$DECK_CONTAINER
 # The container's /data folder on the host, wherever the Unraid template put it.
@@ -13,9 +14,16 @@ DATA=${DATA:-/mnt/user/appdata/deck}
 WORK=$DATA/curate-work
 LOG=$DATA/curate.log
 
+# `deck` for Claude: a wrapper that runs the command in the container. It lives
+# outside $WORK, which Claude may edit.
+BIN=$(mktemp -d)
+trap 'rm -rf "$BIN"' EXIT
+printf '#!/bin/bash\nexec docker exec -i "${DECK_CONTAINER:-deck}" deck "$@"\n' > "$BIN/deck"
+chmod +x "$BIN/deck"
+
 export HOME=${HOME:-/root}
 export CLAUDE_CONFIG_DIR=${CLAUDE_CONFIG_DIR:-/mnt/user/appdata/claude-code/.claude}
-export PATH="$HERE/bin:$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin"
+export PATH="$BIN:$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin"
 # Lets the run start from a terminal where Claude Code is already running.
 unset CLAUDECODE
 
@@ -30,6 +38,17 @@ if ! docker exec "$CONTAINER" true 2>/dev/null; then
   exit 1
 fi
 
+# The prompt comes from the image unless the data folder has its own prompt.md.
+if [[ -f "$DATA/prompt.md" ]]; then
+  prompt=$(cat "$DATA/prompt.md")
+else
+  prompt=$(docker exec "$CONTAINER" cat /app/curate/prompt.md)
+fi
+if [[ -z "$prompt" ]]; then
+  log "=== curate: no prompt (update the $CONTAINER image or add $DATA/prompt.md)"
+  exit 1
+fi
+
 mkdir -p "$WORK"
 rm -f "$WORK"/*.json
 before=$(stat -c %Y "$DATA/curated.json" 2>/dev/null || echo 0)
@@ -41,7 +60,7 @@ model_args=()
 
 log "=== curate: start"
 cd "$WORK" || exit 1
-timeout 45m claude -p "$(cat "$HERE/curate/prompt.md")" \
+timeout 45m claude -p "$prompt" \
   "${model_args[@]}" \
   --permission-mode dontAsk \
   --allowedTools "Bash(deck taste)" "Bash(deck curate submit:*)" \

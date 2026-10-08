@@ -43,11 +43,12 @@ sidottu Maciin: se on Docker-kontti, joka toimii palvelimella.
   Ilman `--dry-run`-valitsinta se kirjoittaa listan ja tekee soittolistan.
 - Claude saa käyttää vain näitä kahta komentoa, kirjoittaa ehdokastiedostoja
   työhakemistoonsa ja tehdä verkkohakuja. Ohje on tiedostossa
-  [`curate/prompt.md`](curate/prompt.md), ja sitä voi muokata vapaasti.
+  [`curate/prompt.md`](curate/prompt.md). Omaa versiota varten kopioi se datakansioon
+  nimellä `prompt.md`, jolloin viikkoajo käyttää sitä imagen ohjeen sijaan.
 
 ## Käyttöönotto
 
-### 1. Kontti ja repo
+### 1. Kontti
 
 GitHub Actions rakentaa jokaisesta `main`-haaran commitista imagen
 `ghcr.io/lepis0/deck-roon:latest` (ja `sha-…`-tagin, versiotagista `v1.2.3` myös
@@ -65,19 +66,12 @@ GitHub Actions rakentaa jokaisesta `main`-haaran commitista imagen
    imagen. **Apply update** hakee sen. Automaattisesti päivitykset hoituvat
    CA Auto Update -lisäosalla.
 
-**Viikkoajon skriptit** (`bin/deck`, `bin/deck-curate`, `curate/prompt.md`) ajetaan
-hostilla, joten repo kloonataan myös palvelimelle. Appdatan alla repo pysyy
-cache-levyllä, eikä viikkoajo herätä arrayn levyjä:
+Viikkoajon skripti ja ohje (`bin/deck-curate`, `curate/prompt.md`) ovat imagessa.
+Repoa ei siis tarvitse kloonata palvelimelle, ja skriptit päivittyvät kontin mukana.
+Skripti ajetaan hostilla, koska se käyttää hostin Claude Codea (ks. kohta 6).
 
-```sh
-git clone https://github.com/lepis0/deck-roon.git /mnt/user/appdata/deck-roon
-```
-
-Päivitä ne komennolla `git -C /mnt/user/appdata/deck-roon pull`.
-
-Repon paikka on vapaa. `bin/deck-curate` lukee datakansion kontin `/data`-liitoksesta,
-joten templaten Data-polun voi vaihtaa. Jos kontin nimi on muu kuin `deck`, kerro se
-muuttujalla `DECK_CONTAINER`.
+Skripti lukee datakansion kontin `/data`-liitoksesta, joten templaten Data-polun voi
+vaihtaa. Jos kontin nimi on muu kuin `deck`, kerro se muuttujalla `DECK_CONTAINER`.
 
 Ilman Unraidia: `docker compose up -d` (`docker-compose.yml`).
 
@@ -97,7 +91,7 @@ lastfm_api_key = "…"
 lastfm_user = "…"
 ```
 
-Tarkistus: `bin/deck taste | head -c 500`
+Tarkistus: `docker exec deck deck taste | head -c 500`
 
 ### 4. TIDAL
 
@@ -119,7 +113,7 @@ ja suosikkeihin.
 ### 5. Ensimmäinen lista
 
 ```sh
-/mnt/user/appdata/deck-roon/bin/deck-curate
+bash -c "$(docker exec deck cat /app/bin/deck-curate)"
 ```
 
 Ajo kestää muutamia minuutteja. Loki menee tiedostoon `/mnt/user/appdata/deck/curate.log`.
@@ -131,18 +125,19 @@ Unraid → **Settings → User Scripts** → **Add new script**, esimerkiksi nim
 
 ```sh
 #!/bin/bash
-/mnt/user/appdata/deck-roon/bin/deck-curate
+bash -c "$(docker exec deck cat /app/bin/deck-curate)"
 ```
 
 Valitse ajastukseksi **Custom** ja `0 9 * * 1` (maanantaisin klo 9).
 
-`bin/deck-curate` käyttää hostin `claude`-komentoa ja asetushakemistoa
+Skripti käyttää hostin `claude`-komentoa ja asetushakemistoa
 `CLAUDE_CONFIG_DIR` (oletuksena `/mnt/user/appdata/claude-code/.claude`). Mallin voi
 valita ympäristömuuttujalla `DECK_CLAUDE_MODEL`.
 
 ## Komennot
 
-`bin/deck` ajaa komennon kontissa:
+Komennot ajetaan kontissa, esimerkiksi `docker exec deck deck taste`. Repon `bin/deck`
+lyhentää tämän muotoon `bin/deck taste`.
 
 | Komento | Mitä tekee |
 |---|---|

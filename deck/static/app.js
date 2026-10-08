@@ -137,7 +137,7 @@ function renderWeek() {
   const albums = state.curated?.albums || [];
   if (!state.curated) {
     box.replaceChildren(el("p", { class: "empty" },
-      "Listaa ei ole vielä tehty. Aja palvelimella bin/deck-curate, niin viikon 20 albumia ilmestyvät tähän."));
+      "Listaa ei ole vielä tehty. Aja palvelimella viikkoajo (deck-curate), niin viikon 20 albumia ilmestyvät tähän."));
   } else if (!albums.length) {
     box.replaceChildren(el("p", { class: "empty" }, "Kaikki tämän viikon albumit on käyty läpi."));
   } else {
