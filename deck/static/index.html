@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deck</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <span class="logo">DECK</span>
+    <span class="round" id="round"></span>
+  </div>
+  <div class="controls">
+    <label class="zone">
+      <span>Zone</span>
+      <select id="zone"></select>
+    </label>
+    <span class="chip" id="roon-status"></span>
+    <span class="chip" id="tidal-status"></span>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button data-tab="week" class="active">Tämä viikko</button>
+  <button data-tab="history">Aiemmat</button>
+  <button data-tab="shelf">Hylly</button>
+</nav>
+
+<main>
+  <section id="week">
+    <div id="albums" class="albums"></div>
+    <div class="footer-actions">
+      <button id="make-playlist" class="ghost">Luo viikon TIDAL-soittolista</button>
+    </div>
+  </section>
+  <section id="history" hidden></section>
+  <section id="shelf" hidden></section>
+</main>
+
+<dialog id="tidal-dialog">
+  <form method="dialog" class="dialog">
+    <h2>Kirjaudu TIDALiin</h2>
+    <p>Tarvitaan, jotta Deck voi luoda viikon soittolistan ja lisätä albumeja suosikkeihin.
+       Molemmat näkyvät Roonissa, kun Roon synkronoi TIDALin.</p>
+    <p><a id="tidal-login-link" href="/tidal/login" target="_blank" rel="noopener">1. Avaa TIDAL-kirjautuminen</a></p>
+    <p>2. Jos selain ei palannut tänne kirjautumisen jälkeen, kopioi osoiteriviltä koko
+       osoite (alkaa tidal-sovelluksesi Redirect URI:lla) ja liitä se tähän:</p>
+    <input id="tidal-url" type="url" placeholder="http://localhost:8795/tidal/callback?code=…">
+    <div class="dialog-actions">
+      <button value="cancel" class="ghost">Peruuta</button>
+      <button id="tidal-finish" value="default">Valmis</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>

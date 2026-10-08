@@ -1,0 +1,58 @@
+#!/bin/bash
+# The weekly run: Claude Code reads the taste profile and writes this week's list
+# with curate/prompt.md. Run on the Unraid host, e.g. from User Scripts every Monday.
+set -uo pipefail
+
+HERE=$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)
+DATA=${DECK_DATA_HOST:-/mnt/user/appdata/deck}
+WORK=$DATA/curate-work
+LOG=$DATA/curate.log
+
+export HOME=${HOME:-/root}
+export CLAUDE_CONFIG_DIR=${CLAUDE_CONFIG_DIR:-/mnt/user/appdata/claude-code/.claude}
+export PATH="$HERE/bin:$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin"
+# Lets the run start from a terminal where Claude Code is already running.
+unset CLAUDECODE
+
+log() { echo "$(date '+%F %T') $*" | tee -a "$LOG"; }
+
+if ! command -v claude >/dev/null; then
+  log "=== curate: claude not found (PATH=$PATH)"
+  exit 1
+fi
+if ! docker exec deck true 2>/dev/null; then
+  log "=== curate: the deck container is not running"
+  exit 1
+fi
+
+mkdir -p "$WORK"
+rm -f "$WORK"/*.json
+before=$(stat -c %Y "$DATA/curated.json" 2>/dev/null || echo 0)
+
+# Claude Code saves long tool output (deck taste) in this folder; Read may read it.
+slug=$(printf '%s' "$WORK" | sed 's/[^A-Za-z0-9]/-/g')
+model_args=()
+[[ -n "${DECK_CLAUDE_MODEL:-}" ]] && model_args=(--model "$DECK_CLAUDE_MODEL")
+
+log "=== curate: start"
+cd "$WORK" || exit 1
+timeout 45m claude -p "$(cat "$HERE/curate/prompt.md")" \
+  "${model_args[@]}" \
+  --permission-mode dontAsk \
+  --allowedTools "Bash(deck taste)" "Bash(deck curate submit:*)" \
+                 "Edit(/$WORK/**)" "Read(/$WORK/**)" \
+                 "Read(/$CLAUDE_CONFIG_DIR/projects/$slug/**)" "Grep(/$CLAUDE_CONFIG_DIR/projects/$slug/**)" \
+                 "WebSearch" \
+  --strict-mcp-config \
+  --no-session-persistence \
+  --output-format text \
+  </dev/null 2>&1 | tee -a "$LOG"
+status=${PIPESTATUS[0]}
+
+after=$(stat -c %Y "$DATA/curated.json" 2>/dev/null || echo 0)
+if [[ "$after" != "$before" ]]; then
+  log "=== curate: done"
+else
+  log "=== curate: claude exit $status, the list was not updated and the previous list stays"
+  exit 1
+fi

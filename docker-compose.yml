@@ -1,0 +1,12 @@
+services:
+  deck:
+    build: .
+    container_name: deck
+    # Host network: Roon finds extensions on the LAN, and the page is at :8795.
+    network_mode: host
+    environment:
+      - DECK_PORT=8795
+      - TZ=Europe/Helsinki
+    volumes:
+      - /mnt/user/appdata/deck:/data
+    restart: unless-stopped

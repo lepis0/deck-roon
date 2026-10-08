@@ -1,0 +1,4 @@
+#!/bin/bash
+# Runs a deck command in the container, e.g. `deck taste` or
+# `deck curate submit --dry-run < round-1.json`.
+exec docker exec -i "${DECK_CONTAINER:-deck}" python -m deck "$@"
