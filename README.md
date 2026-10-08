@@ -10,7 +10,7 @@ sidottu Maciin: se on Docker-kontti, joka toimii palvelimella.
 
 ## Mitä saat
 
-- **Web-sivu** (http://192.168.1.2:8795): viikon albumit kansikuvineen ja perusteluineen.
+- **Web-sivu** (`http://<unraid-ip>:8795`): viikon albumit kansikuvineen ja perusteluineen.
   - **▶ Soita / + Jonoon**: albumi soimaan valitussa Roon-zonessa. Deck hakee albumin
     Roonin omalla haulla ja käyttää samaa Play Album → Play Now / Queue -polkua kuin
     Roonin oma sovellus.
@@ -47,19 +47,34 @@ sidottu Maciin: se on Docker-kontti, joka toimii palvelimella.
 
 ## Käyttöönotto
 
-### 1. Kontti
+### 1. Kontti ja repo
 
-Kontti on jo rakennettu ja käynnissä nimellä `deck`. Uudelleenrakennus koodimuutosten
-jälkeen:
+GitHub Actions rakentaa jokaisesta `main`-haaran commitista imagen
+`ghcr.io/lepis0/deck-roon:latest` (ja `sha-…`-tagin, versiotagista `v1.2.3` myös
+`1.2.3` ja `1.2`).
+
+**Unraid:**
+1. Kopioi template palvelimelle:
+   ```sh
+   curl -fsSL -o /boot/config/plugins/dockerMan/templates-user/my-deck.xml \
+     https://raw.githubusercontent.com/lepis0/deck-roon/main/unraid/deck-roon.xml
+   ```
+2. **Docker → Add Container → Template: deck → Apply.** Kontti käyttää host-verkkoa,
+   jotta Roon löytää laajennuksen.
+3. Päivitykset: Docker-sivu näyttää **update ready**, kun GitHub on julkaissut uuden
+   imagen. **Apply update** hakee sen. Automaattisesti päivitykset hoituvat
+   CA Auto Update -lisäosalla.
+
+**Viikkoajon skriptit** (`bin/deck`, `bin/deck-curate`, `curate/prompt.md`) ajetaan
+hostilla, joten repo kloonataan myös palvelimelle:
 
 ```sh
-cd /mnt/user/others/deck
-docker build -t deck:latest . && docker rm -f deck && \
-docker run -d --name deck --network host --restart unless-stopped \
-  -e DECK_PORT=8795 -e TZ=Europe/Helsinki -v /mnt/user/appdata/deck:/data deck:latest
+git clone https://github.com/lepis0/deck-roon.git /mnt/user/others/deck
 ```
 
-(tai `docker compose up -d --build`, jos Compose on käytettävissä.)
+Päivitä ne komennolla `git -C /mnt/user/others/deck pull`.
+
+Ilman Unraidia: `docker compose up -d` (`docker-compose.yml`).
 
 ### 2. Roon
 
@@ -83,7 +98,7 @@ Tarkistus: `bin/deck taste | head -c 500`
 
 1. Kirjaudu osoitteessa [developer.tidal.com](https://developer.tidal.com) ja luo
    sovellus (Dashboard → Create app).
-2. Lisää sovelluksen asetuksiin **Redirect URI** `http://192.168.1.2:8795/tidal/callback`
+2. Lisää sovelluksen asetuksiin **Redirect URI** `http://<unraid-ip>:8795/tidal/callback`
    ja ota käyttöön scopet `collection.read collection.write playlists.read
    playlists.write search.read user.read`, jos dashboard kysyy niitä.
 3. Kopioi **Client ID** ja **Client Secret** tiedostoon `config.toml`
@@ -157,6 +172,8 @@ valita ympäristömuuttujalla `DECK_CLAUDE_MODEL`.
 ## Kehitys
 
 ```sh
-docker build -t deck:latest .
-docker run --rm -v "$PWD/tests:/app/tests:ro" deck:latest python -m pytest -q tests
+pip install -r requirements.txt
+python -m pytest -q tests
+# tai kontissa:
+docker build -t deck:dev . && docker run --rm -v "$PWD/tests:/app/tests:ro" deck:dev python -m pytest -q tests
 ```

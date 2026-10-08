@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>deck</Name>
+  <Repository>ghcr.io/lepis0/deck-roon:latest</Repository>
+  <Registry>https://github.com/lepis0/deck-roon/pkgs/container/deck-roon</Registry>
+  <Network>host</Network>
+  <MyIP/>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/lepis0/deck-roon/issues</Support>
+  <Project>https://github.com/lepis0/deck-roon</Project>
+  <Overview>Viikon levysuositukset Rooniin: 20 kuulematonta albumia Last.fm-historian perusteella, perustelut suomeksi, soitto Roonissa TIDALin kautta. Host-verkko tarvitaan, jotta Roon löytää laajennuksen.</Overview>
+  <Category>MediaServer:Music</Category>
+  <WebUI>http://[IP]:8795/</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/lepis0/deck-roon/main/unraid/deck-roon.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/lepis0/deck-roon/main/deck/static/icon.svg</Icon>
+  <ExtraParams/>
+  <PostArgs/>
+  <CPUset/>
+  <Requires>Roon Core, TIDAL-tili ja Last.fm-tili. Viikkoajo tarvitsee Claude Coden Unraid-hostilla (bin/deck-curate).</Requires>
+  <Config Name="Data" Target="/data" Default="/mnt/user/appdata/deck" Mode="rw" Description="Asetukset (config.toml), listat ja kirjautumiset" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/deck</Config>
+  <Config Name="Port" Target="DECK_PORT" Default="8795" Mode="" Description="Web-sivun portti (host-verkko)" Type="Variable" Display="always" Required="true" Mask="false">8795</Config>
+  <Config Name="TZ" Target="TZ" Default="Europe/Helsinki" Mode="" Description="Aikavyöhyke" Type="Variable" Display="advanced" Required="false" Mask="false">Europe/Helsinki</Config>
+</Container>
