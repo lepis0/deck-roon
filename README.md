@@ -66,13 +66,18 @@ GitHub Actions rakentaa jokaisesta `main`-haaran commitista imagen
    CA Auto Update -lisäosalla.
 
 **Viikkoajon skriptit** (`bin/deck`, `bin/deck-curate`, `curate/prompt.md`) ajetaan
-hostilla, joten repo kloonataan myös palvelimelle:
+hostilla, joten repo kloonataan myös palvelimelle. Appdatan alla repo pysyy
+cache-levyllä, eikä viikkoajo herätä arrayn levyjä:
 
 ```sh
-git clone https://github.com/lepis0/deck-roon.git /mnt/user/others/deck
+git clone https://github.com/lepis0/deck-roon.git /mnt/user/appdata/deck-roon
 ```
 
-Päivitä ne komennolla `git -C /mnt/user/others/deck pull`.
+Päivitä ne komennolla `git -C /mnt/user/appdata/deck-roon pull`.
+
+Repon paikka on vapaa. `bin/deck-curate` lukee datakansion kontin `/data`-liitoksesta,
+joten templaten Data-polun voi vaihtaa. Jos kontin nimi on muu kuin `deck`, kerro se
+muuttujalla `DECK_CONTAINER`.
 
 Ilman Unraidia: `docker compose up -d` (`docker-compose.yml`).
 
@@ -114,7 +119,7 @@ ja suosikkeihin.
 ### 5. Ensimmäinen lista
 
 ```sh
-/mnt/user/others/deck/bin/deck-curate
+/mnt/user/appdata/deck-roon/bin/deck-curate
 ```
 
 Ajo kestää muutamia minuutteja. Loki menee tiedostoon `/mnt/user/appdata/deck/curate.log`.
@@ -126,7 +131,7 @@ Unraid → **Settings → User Scripts** → **Add new script**, esimerkiksi nim
 
 ```sh
 #!/bin/bash
-/mnt/user/others/deck/bin/deck-curate
+/mnt/user/appdata/deck-roon/bin/deck-curate
 ```
 
 Valitse ajastukseksi **Custom** ja `0 9 * * 1` (maanantaisin klo 9).

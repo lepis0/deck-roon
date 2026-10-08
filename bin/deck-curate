@@ -4,7 +4,12 @@
 set -uo pipefail
 
 HERE=$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)
-DATA=${DECK_DATA_HOST:-/mnt/user/appdata/deck}
+export DECK_CONTAINER=${DECK_CONTAINER:-deck}
+CONTAINER=$DECK_CONTAINER
+# The container's /data folder on the host, wherever the Unraid template put it.
+DATA=${DECK_DATA_HOST:-$(docker inspect "$CONTAINER" \
+  --format '{{range .Mounts}}{{if eq .Destination "/data"}}{{.Source}}{{end}}{{end}}' 2>/dev/null)}
+DATA=${DATA:-/mnt/user/appdata/deck}
 WORK=$DATA/curate-work
 LOG=$DATA/curate.log
 
@@ -20,8 +25,8 @@ if ! command -v claude >/dev/null; then
   log "=== curate: claude not found (PATH=$PATH)"
   exit 1
 fi
-if ! docker exec deck true 2>/dev/null; then
-  log "=== curate: the deck container is not running"
+if ! docker exec "$CONTAINER" true 2>/dev/null; then
+  log "=== curate: the $CONTAINER container is not running"
   exit 1
 fi
 
