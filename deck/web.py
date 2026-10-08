@@ -57,6 +57,12 @@ def index() -> FileResponse:
     return FileResponse(STATIC / "index.html", headers={"Cache-Control": "no-cache"})
 
 
+@app.get("/manifest.webmanifest")
+def manifest() -> FileResponse:
+    """Lets a phone add the page to its home screen as an app."""
+    return FileResponse(STATIC / "manifest.webmanifest", media_type="application/manifest+json")
+
+
 @app.get("/api/state")
 def state() -> dict:
     shelf = lists.load_shelf()

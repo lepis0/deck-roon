@@ -223,3 +223,5 @@ $("#tidal-finish").addEventListener("click", async (e) => {
 refresh();
 // Roon zones and the pairing status change in the background.
 setInterval(() => { if (!document.hidden) refresh(true); }, 15000);
+// A home screen app has no reload button: refresh as soon as it is opened again.
+document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(true); });

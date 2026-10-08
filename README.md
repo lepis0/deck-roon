@@ -18,6 +18,11 @@ sidottu Maciin: se on Docker-kontti, joka toimii palvelimella.
     kirjastoon. Seuraava lista oppii siitä, mistä pidit.
   - **✕ Ei minulle**: poistaa albumin listalta, ja seuraava lista välttää samanlaisia.
   - **Aiemmat** ja **Hylly**: aiemmat listat ja hyllyyn nostetut levyt.
+  - **Kännykän aloitusnäytölle**: iPhonessa Safari → Jaa → **Lisää Koti-valikkoon**,
+    Androidissa Chrome → ⋮ → **Lisää aloitusnäytölle**. Sivu aukeaa omana sovelluksenaan
+    ilman selaimen palkkeja. Android avaa sen omaan ikkunaansa vain HTTPS-osoitteesta
+    (esim. käänteinen välityspalvelin tai Tailscale); pelkästä `http://`-osoitteesta
+    se tekee tavallisen kirjanmerkin.
 - **TIDAL-soittolista** "Deck · viikko 41/2026", joka sisältää viikon kaikkien albumien
   kappaleet. Roon synkronoi sen, joten viikon listan näkee myös Roonin omasta
   sovelluksesta. Edellisen viikon soittolista poistetaan, ellei asetuksissa ole
