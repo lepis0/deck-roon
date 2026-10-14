@@ -57,11 +57,21 @@ class Roon:
                 self.status = (f"odotetaan hyväksyntää: Roon → Asetukset → Laajennukset → "
                                f"{APPINFO['display_name']} → Ota käyttöön") if not token else "yhdistetään"
                 try:
-                    api = RoonApi(APPINFO, token, host, port, blocking_init=True)
+                    api = RoonApi(APPINFO, token, host, port, blocking_init=False)
                 except Exception as e:  # roonapi raises plain exceptions
                     log.warning("Roon %s:%s: %s", host, port, e)
                     self.status = f"ei yhteyttä Roon Coreen ({host}:{port})"
                     continue
+                # roonapi's blocking init never returns if the first connection fails
+                # (the Core is still booting), so wait here; its watcher reconnects every 20 s.
+                waiting = self.status
+                while not api.ready:
+                    self.status = (f"ei yhteyttä Roon Coreen ({host}:{port}), yritetään uudelleen"
+                                   if api._roonsocket.failed_state else waiting)
+                    time.sleep(1)
+                # What blocking init would do: the subscription brings only changes.
+                api._zones = api._get_zones()
+                api._outputs = api._get_outputs()
                 if api.token:
                     token_file.write_text(api.token)
                 self.api = api
