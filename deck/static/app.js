@@ -105,6 +105,19 @@ async function reject(album, button) {
   });
 }
 
+// roonarc:// only launches ARC, it takes no album, so the name goes on the clipboard for ARC's search.
+// The copy has to start inside the tap, before the link hands the page over to ARC.
+function arcLink(album) {
+  const query = `${album.artist} ${album.album}`;
+  const copy = () => {
+    if (!navigator.clipboard) return toast("Kopiointi vaatii HTTPS-osoitteen. Hae albumi ARCista käsin.", true);
+    navigator.clipboard.writeText(query)
+      .then(() => toast(`Kopioitu: ${query}. Liitä se ARCin hakuun.`))
+      .catch(() => toast("Kopiointi ei onnistunut. Hae albumi ARCista käsin.", true));
+  };
+  return el("a", { href: "roonarc://", title: "Kopioi albumin nimen ja avaa Roon ARCin", onclick: copy }, "ARC ↗");
+}
+
 function albumCard(album, index) {
   const onShelf = state.shelf.includes(album.id);
   const shelfButton = el("button", { class: onShelf ? "shelved" : "",
@@ -129,7 +142,7 @@ function albumCard(album, index) {
       el("div", { class: "artist" }, album.artist, album.year ? el("span", { class: "year" }, ` · ${album.year}`) : null),
       album.reason ? el("p", { class: "reason" }, album.reason) : null,
       el("div", { class: "actions" }, playButton, queueButton, shelfButton, rejectButton,
-        el("a", { href: album.url, target: "_blank", rel: "noopener" }, "TIDAL ↗"))));
+        el("a", { href: album.url, target: "_blank", rel: "noopener" }, "TIDAL ↗"), arcLink(album))));
 }
 
 function renderWeek() {
@@ -155,7 +168,7 @@ function historyRow(album) {
   button.addEventListener("click", () => play(album.id, "play", button));
   return el("div", { class: "row" },
     el("span", { class: "name" }, `${album.artist} – ${album.album}`, album.year ? ` (${album.year})` : ""),
-    tag, button);
+    tag, button, arcLink(album));
 }
 
 async function renderHistory() {

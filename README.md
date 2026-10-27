@@ -17,6 +17,9 @@ sidottu Maciin: se on Docker-kontti, joka toimii palvelimella.
   - **★ Hyllyyn**: lisää albumin TIDAL-suosikkeihin, jolloin se ilmestyy Roonin
     kirjastoon. Seuraava lista oppii siitä, mistä pidit.
   - **✕ Ei minulle**: poistaa albumin listalta, ja seuraava lista välttää samanlaisia.
+  - **ARC ↗**: kopioi artistin ja albumin nimen ja avaa Roon ARCin, jossa nimen voi
+    liittää hakuun. ARC ei ota vastaan linkkiä tiettyyn albumiin, vaan `roonarc://`
+    vain avaa sovelluksen. Kopiointi toimii vain HTTPS-osoitteesta.
   - **Aiemmat** ja **Hylly**: aiemmat listat ja hyllyyn nostetut levyt.
   - **Kännykän aloitusnäytölle**: iPhonessa Safari → Jaa → **Lisää Koti-valikkoon**,
     Androidissa Chrome → ⋮ → **Lisää aloitusnäytölle**. Sivu aukeaa omana sovelluksenaan
